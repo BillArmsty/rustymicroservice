@@ -1,8 +1,26 @@
-use actix_web::{ get, web, App, HttpResponse, HttpServer, Responder };
+use actix_web::{ get, web, App, HttpResponse,
+    
+    
+     HttpServer, Responder };
+     
+use std::sync::Mutex;
 
 struct AppState {
     app_name: String,
 }
+
+struct AppStateWithCounter {
+    counter: Mutex<i32>,
+}
+
+async fn count(data: web::Data<AppStateWithCounter>) -> String {
+    let mut counter = data.counter.lock().unwrap();
+    *counter += 1;
+
+    format!("Request number: {counter}")
+}
+
+
 
 #[get("/")]
 async fn index(data: web::Data<AppState>) -> impl Responder {
